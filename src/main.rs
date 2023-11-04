@@ -32,11 +32,11 @@ pub struct DecodeOpts {
 fn main() {
     let args = Cli::parse();
     match args.command {
-        Commands::Encode(filename) => {
-            println!("encoding {:?}", filename);
+        Commands::Encode(opts) => {
+            println!("encoding {}", opts.filename);
         }
-        Commands::Decode(filename) => {
-            println!("decoding {:?}", filename);
+        Commands::Decode(opts) => {
+            println!("decoding {}", opts.filename);
         }
     }
 }

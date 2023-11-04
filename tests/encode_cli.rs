@@ -11,6 +11,8 @@ Options:
   -h, --help  Print help
 ";
 
+const ENCODE_OUTPUT_STR: &str = "encoding tests/samples/sample.txt\n";
+
 #[test]
 fn help_encode() {
     Command::cargo_bin("compression")
@@ -19,4 +21,14 @@ fn help_encode() {
         .assert()
         .success()
         .stdout(HELP_STR);
+}
+
+#[test]
+fn encode_output() {
+    Command::cargo_bin("compression")
+        .unwrap()
+        .args(["encode", "tests/samples/sample.txt"])
+        .assert()
+        .success()
+        .stdout(ENCODE_OUTPUT_STR);
 }
