@@ -18,15 +18,14 @@ pub enum Commands {
 
 #[derive(Parser, Debug)]
 pub struct EncodeOpts {
-    // filename to encode
-    #[arg(value_hint = ValueHint::FilePath)]
+    #[arg(value_hint = ValueHint::FilePath, help = "filename to encode")]
     pub filename: String,
 }
 
 #[derive(Parser, Debug)]
 pub struct DecodeOpts {
     // filename to encode
-    #[arg(value_hint = ValueHint::FilePath)]
+    #[arg(value_hint = ValueHint::FilePath, help = "filename to decode")]
     pub filename: String,
 }
 

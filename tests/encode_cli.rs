@@ -5,7 +5,7 @@ const HELP_STR: &str = "encode a file
 Usage: compression encode <FILENAME>
 
 Arguments:
-  <FILENAME>  
+  <FILENAME>  filename to encode
 
 Options:
   -h, --help  Print help

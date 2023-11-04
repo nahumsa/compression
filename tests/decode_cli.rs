@@ -5,7 +5,7 @@ const HELP_STR: &str = "decode a file
 Usage: compression decode <FILENAME>
 
 Arguments:
-  <FILENAME>  
+  <FILENAME>  filename to decode
 
 Options:
   -h, --help  Print help
