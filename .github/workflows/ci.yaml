@@ -1,0 +1,52 @@
+name: compression
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install the Rust toolchain
+        uses: dtolnay/rust-toolchain@1.67.0
+      - name: Run tests
+        run: cargo test --verbose
+
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@1.67.0
+        with:
+          components: rustfmt
+      - name: Formatting
+        run: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@1.67.0
+        with:
+          components: clippy
+      - name: Linting
+        run: cargo clippy # -- -D warnings
+
+  coverage:
+    name: Code coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@1.67.0
+      - name: Generate code coverage
+        run: cargo install cargo-tarpaulin && cargo tarpaulin --verbose --workspace
