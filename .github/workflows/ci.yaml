@@ -10,17 +10,43 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Install the Rust toolchain
         uses: dtolnay/rust-toolchain@1.72.1
-      - name: Formatting
-        run: cargo fmt --all -- --check
-      - name: Linting
-        run: cargo clippy  -- -D warnings
       - name: Run tests
         run: cargo test --verbose
+
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@1.72.1
+        with:
+          components: rustfmt
+      - name: Formatting
+        run: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@1.72.1
+        with:
+          components: clippy
+      - name: Linting
+        run: cargo clippy # -- -D warnings
+
+  coverage:
+    name: Code coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@1.72.1
       - name: Generate code coverage
         run: cargo install cargo-tarpaulin && cargo tarpaulin --verbose --workspace
