@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand, ValueHint};
-use compression::io::read_file;
+use compression::{domain::char_count::character_count, io::read_file};
 
 #[derive(Debug, Parser)]
 #[command(name = "compression")]
@@ -35,7 +35,10 @@ fn main() {
     match args.command {
         Commands::Encode(opts) => {
             let file_content = read_file(opts.filename.as_str());
-            println!("{}", file_content)
+            let character_frequency = character_count(&file_content);
+            let mut sorted_vec: Vec<_> = character_frequency.iter().collect();
+            sorted_vec.sort_by(|a, b| b.0.cmp(a.0));
+            println!("{:?}", sorted_vec)
         }
         Commands::Decode(opts) => {
             println!("decoding {}", opts.filename);

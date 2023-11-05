@@ -11,7 +11,7 @@ Options:
   -h, --help  Print help
 ";
 
-const ENCODE_OUTPUT_STR: &str = "hello world\n\n";
+const ENCODE_OUTPUT_STR: &str = r#"[('w', 1), ('r', 1), ('o', 2), ('l', 3), ('h', 1), ('e', 1), ('d', 1), (' ', 1), ('\n', 1)]"#;
 
 #[test]
 fn help_encode() {
@@ -30,5 +30,5 @@ fn encode_output() {
         .args(["encode", "tests/samples/sample.txt"])
         .assert()
         .success()
-        .stdout(ENCODE_OUTPUT_STR);
+        .stdout(ENCODE_OUTPUT_STR.to_owned() + "\n");
 }
