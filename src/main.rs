@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand, ValueHint};
+use compression::io::read_file;
 
 #[derive(Debug, Parser)]
 #[command(name = "compression")]
@@ -33,7 +34,8 @@ fn main() {
     let args = Cli::parse();
     match args.command {
         Commands::Encode(opts) => {
-            println!("encoding {}", opts.filename);
+            let file_content = read_file(opts.filename.as_str());
+            println!("{}", file_content)
         }
         Commands::Decode(opts) => {
             println!("decoding {}", opts.filename);

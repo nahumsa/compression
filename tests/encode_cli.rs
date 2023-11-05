@@ -11,7 +11,7 @@ Options:
   -h, --help  Print help
 ";
 
-const ENCODE_OUTPUT_STR: &str = "hello world";
+const ENCODE_OUTPUT_STR: &str = "hello world\n\n";
 
 #[test]
 fn help_encode() {
