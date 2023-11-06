@@ -1,8 +1,8 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, collections::VecDeque, rc::Rc};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct HuffmanNode {
-    pub value: u8,
+    pub weight: u8,
     pub char: char,
 }
 
@@ -17,6 +17,7 @@ impl<T> Tree<T> {
     pub fn new(node: T) -> Self {
         Tree {
             node: node,
+            node,
             left: None,
             right: None,
         }
@@ -40,11 +41,11 @@ mod tests {
     #[test]
     fn test_new_tree() {
         let tree = Tree::new(HuffmanNode {
-            value: 0,
+            weight: 0,
             char: 'a',
         });
         let expect = HuffmanNode {
-            value: 0,
+            weight: 0,
             char: 'a',
         };
 
@@ -54,26 +55,54 @@ mod tests {
     #[test]
     fn test_insert_left() {
         let expect_root = HuffmanNode {
-            value: 0,
+            weight: 0,
             char: 'a',
         };
 
         let expect_left = HuffmanNode {
-            value: 0,
+            weight: 0,
             char: 'b',
         };
 
         let tree = Tree::new(HuffmanNode {
-            value: 0,
+            weight: 0,
             char: 'a',
         })
         .left(Tree::new(HuffmanNode {
-            value: 0,
+            weight: 0,
             char: 'b',
         }));
 
         if let Some(node) = tree.left {
             assert_eq!(expect_left, node.node);
+        }
+
+        assert_eq!(expect_root, tree.node);
+    }
+
+    #[test]
+    fn test_insert_right() {
+        let expect_root = HuffmanNode {
+            weight: 0,
+            char: 'a',
+        };
+
+        let expect_right = HuffmanNode {
+            weight: 0,
+            char: 'b',
+        };
+
+        let tree = Tree::new(HuffmanNode {
+            weight: 0,
+            char: 'a',
+        })
+        .right(Tree::new(HuffmanNode {
+            weight: 0,
+            char: 'b',
+        }));
+
+        if let Some(node) = tree.right {
+            assert_eq!(expect_right, node.node);
         }
 
         assert_eq!(expect_root, tree.node);
