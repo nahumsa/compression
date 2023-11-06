@@ -21,6 +21,16 @@ impl<T> Tree<T> {
             right: None,
         }
     }
+
+    pub fn left(mut self, node: Tree<T>) -> Self {
+        self.left = Some(Box::new(node));
+        self
+    }
+
+    pub fn right(mut self, node: Tree<T>) -> Self {
+        self.right = Some(Box::new(node));
+        self
+    }
 }
 
 #[cfg(test)]
@@ -29,18 +39,43 @@ mod tests {
 
     #[test]
     fn test_new_tree() {
-        let expect = Tree {
-            node: HuffmanNode {
-                value: 0,
-                char: 'a',
-            },
-            left: None,
-            right: None,
-        };
-        let got = Tree::new(HuffmanNode {
+        let tree = Tree::new(HuffmanNode {
             value: 0,
             char: 'a',
         });
-        assert_eq!(expect, got);
+        let expect = HuffmanNode {
+            value: 0,
+            char: 'a',
+        };
+
+        assert_eq!(expect, tree.node);
+    }
+
+    #[test]
+    fn test_insert_left() {
+        let expect_root = HuffmanNode {
+            value: 0,
+            char: 'a',
+        };
+
+        let expect_left = HuffmanNode {
+            value: 0,
+            char: 'b',
+        };
+
+        let tree = Tree::new(HuffmanNode {
+            value: 0,
+            char: 'a',
+        })
+        .left(Tree::new(HuffmanNode {
+            value: 0,
+            char: 'b',
+        }));
+
+        if let Some(node) = tree.left {
+            assert_eq!(expect_left, node.node);
+        }
+
+        assert_eq!(expect_root, tree.node);
     }
 }
