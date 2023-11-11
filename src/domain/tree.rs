@@ -40,7 +40,7 @@ impl<T: Clone + Eq> HuffmanNode<T> {
         }
     }
 
-    fn from_freq_table(table: HashMap<T, u64>) -> Self {
+    pub fn from_freq_table(table: HashMap<T, u64>) -> Self {
         let mut heap = BinaryHeap::new();
 
         for (char, weight) in table {
