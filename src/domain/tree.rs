@@ -1,54 +1,61 @@
-use std::collections::VecDeque;
+use std::cmp::Reverse;
+use std::collections::{BinaryHeap, HashMap};
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct HuffmanNode<T> {
-    pub weight: u8,
-    pub char: T,
+    pub weight: u64,
+    pub char: Option<T>,
+    pub left: Option<Box<HuffmanNode<T>>>,
+    pub right: Option<Box<HuffmanNode<T>>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Tree<T: Clone + Eq> {
-    pub node: HuffmanNode<T>,
-    pub weight: u8,
-    pub left: Option<Box<Tree<T>>>,
-    pub right: Option<Box<Tree<T>>>,
-}
-
-impl<T: Clone + Eq> Ord for Tree<T> {
+impl<T: Clone + Eq> Ord for HuffmanNode<T> {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.weight.cmp(&other.weight)
     }
 }
 
-impl<T: Clone + Eq> PartialOrd for Tree<T> {
+impl<T: Clone + Eq> PartialOrd for HuffmanNode<T> {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl<T: Copy + Eq> Tree<T> {
-    pub fn new(node: HuffmanNode<T>, weight: u8) -> Self {
-        Tree {
-            node,
+impl<T: Clone + Eq> HuffmanNode<T> {
+    pub fn leaf(weight: u64, char: Option<T>) -> Self {
+        Self {
             weight,
+            char,
             left: None,
             right: None,
         }
     }
 
-    pub fn left(mut self, node: Tree<T>) -> Self {
-        self.left = Some(Box::new(node));
-        self
+    pub fn node(weight: u64, left: HuffmanNode<T>, right: HuffmanNode<T>) -> Self {
+        Self {
+            weight,
+            char: None,
+            left: Some(Box::new(left)),
+            right: Some(Box::new(right)),
+        }
     }
 
-    pub fn right(mut self, node: Tree<T>) -> Self {
-        self.right = Some(Box::new(node));
-        self
-    }
+    fn from_freq_table(table: HashMap<T, u64>) -> Self {
+        let mut heap = BinaryHeap::new();
 
-    pub fn from_vec(values: Vec<HuffmanNode<T>>) -> Self {
-        let (first_element, rest) = values.split_first().unwrap();
-        Tree::new(*first_element, first_element.weight)
+        for (char, weight) in table {
+            heap.push(Reverse(HuffmanNode::leaf(weight, Some(char))));
+        }
+
+        while heap.len() > 1 {
+            let node_1 = heap.pop().unwrap().0;
+            let node_2 = heap.pop().unwrap().0;
+
+            let merge_node = HuffmanNode::node(node_1.weight + node_2.weight, node_1, node_2);
+            heap.push(Reverse(merge_node));
+        }
+
+        heap.pop().unwrap().0
     }
 }
 
@@ -57,96 +64,18 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_new_tree() {
-        let tree = Tree::new(
-            HuffmanNode {
-                weight: 0,
-                char: 'a',
-            },
-            0,
-        );
+    fn huffman_tree_correct() {
+        let mut table = HashMap::new();
+        table.insert('c', 32);
+        table.insert('d', 42);
+        table.insert('e', 120);
+        table.insert('k', 7);
+        table.insert('l', 42);
+        table.insert('m', 24);
+        table.insert('u', 37);
+        table.insert('z', 2);
+        let got = HuffmanNode::from_freq_table(table);
 
-        let expect_node = HuffmanNode {
-            weight: 0,
-            char: 'a',
-        };
-
-        let expect_weight = 0;
-
-        assert_eq!(expect_node, tree.node);
-        assert_eq!(expect_weight, tree.weight);
+        assert_eq!(got.weight, 306);
     }
-
-    #[test]
-    fn test_insert_left() {
-        let expect_root = HuffmanNode {
-            weight: 0,
-            char: 'a',
-        };
-
-        let expect_left = HuffmanNode {
-            weight: 0,
-            char: 'b',
-        };
-
-        let tree = Tree::new(
-            HuffmanNode {
-                weight: 0,
-                char: 'a',
-            },
-            0,
-        )
-        .left(Tree::new(
-            HuffmanNode {
-                weight: 0,
-                char: 'b',
-            },
-            1,
-        ));
-
-        if let Some(node) = tree.left {
-            assert_eq!(expect_left, node.node);
-            assert_eq!(1, node.weight);
-        }
-
-        assert_eq!(expect_root, tree.node);
-        assert_eq!(0, tree.weight);
-    }
-
-    #[test]
-    fn test_insert_right() {
-        let expect_root = HuffmanNode {
-            weight: 0,
-            char: 'a',
-        };
-
-        let expect_right = HuffmanNode {
-            weight: 0,
-            char: 'b',
-        };
-
-        let tree = Tree::new(
-            HuffmanNode {
-                weight: 0,
-                char: 'a',
-            },
-            0,
-        )
-        .right(Tree::new(
-            HuffmanNode {
-                weight: 0,
-                char: 'b',
-            },
-            1,
-        ));
-
-        if let Some(node) = tree.right {
-            assert_eq!(expect_right, node.node);
-            assert_eq!(1, node.weight);
-        }
-
-        assert_eq!(expect_root, tree.node);
-        assert_eq!(0, tree.weight);
-    }
-    //TODO: add test to insert
 }
