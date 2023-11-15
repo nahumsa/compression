@@ -44,6 +44,7 @@ impl<T: Clone + Eq> HuffmanNode<T> {
         let mut heap = BinaryHeap::new();
 
         for (char, weight) in table {
+            // TODO: fix this for same weight, when this occurs, the response is non deterministic
             heap.push(Reverse(HuffmanNode::leaf(weight, Some(char))));
         }
 
@@ -66,16 +67,83 @@ mod tests {
     #[test]
     fn huffman_tree_correct() {
         let mut table = HashMap::new();
-        table.insert('c', 32);
-        table.insert('d', 42);
-        table.insert('e', 120);
-        table.insert('k', 7);
-        table.insert('l', 42);
-        table.insert('m', 24);
-        table.insert('u', 37);
-        table.insert('z', 2);
+        table.insert('a', 10);
+        table.insert('b', 20);
+        table.insert('c', 110);
+        table.insert('d', 80);
+
         let got = HuffmanNode::from_freq_table(table);
 
-        assert_eq!(got.weight, 306);
+        assert_eq!(got.weight, 220);
+        assert_eq!(got.char, None);
+
+        assert_eq!(got.left.clone().unwrap().weight, 110);
+        assert_eq!(got.left.clone().unwrap().char, Some('c'));
+
+        assert_eq!(got.right.clone().unwrap().weight, 110);
+        assert_eq!(got.right.clone().unwrap().char, None);
+
+        assert_eq!(got.right.clone().unwrap().right.clone().unwrap().weight, 80);
+        assert_eq!(
+            got.right.clone().unwrap().right.clone().unwrap().char,
+            Some('d')
+        );
+
+        assert_eq!(got.right.clone().unwrap().left.clone().unwrap().weight, 30);
+        assert_eq!(got.right.clone().unwrap().left.clone().unwrap().char, None);
+
+        assert_eq!(
+            got.right
+                .clone()
+                .unwrap()
+                .left
+                .clone()
+                .unwrap()
+                .left
+                .clone()
+                .unwrap()
+                .weight,
+            10
+        );
+        assert_eq!(
+            got.right
+                .clone()
+                .unwrap()
+                .left
+                .clone()
+                .unwrap()
+                .left
+                .clone()
+                .unwrap()
+                .char,
+            Some('a')
+        );
+
+        assert_eq!(
+            got.right
+                .clone()
+                .unwrap()
+                .left
+                .clone()
+                .unwrap()
+                .right
+                .clone()
+                .unwrap()
+                .weight,
+            20
+        );
+        assert_eq!(
+            got.right
+                .clone()
+                .unwrap()
+                .left
+                .clone()
+                .unwrap()
+                .right
+                .clone()
+                .unwrap()
+                .char,
+            Some('b')
+        );
     }
 }
