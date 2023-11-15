@@ -1,5 +1,6 @@
 use std::cmp::Reverse;
-use std::collections::{BinaryHeap, HashMap};
+use std::collections::{BinaryHeap, HashMap, VecDeque};
+use std::hash::Hash;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct HuffmanNode<T> {
@@ -57,6 +58,23 @@ impl<T: Clone + Eq> HuffmanNode<T> {
         }
 
         heap.pop().unwrap().0
+    }
+}
+
+pub fn generate_encoding_table_from_tree<T: Eq + Hash>(
+    node: HuffmanNode<T>,
+    h: &mut HashMap<T, String>,
+    s: String,
+) {
+    if let Some(ch) = node.char {
+        h.insert(ch, s);
+    } else {
+        if let Some(left) = node.left {
+            generate_encoding_table_from_tree(*left, h, s.clone() + "0");
+        }
+        if let Some(right) = node.right {
+            generate_encoding_table_from_tree(*right, h, s + "1");
+        }
     }
 }
 
@@ -145,5 +163,25 @@ mod tests {
                 .char,
             Some('b')
         );
+    }
+    #[test]
+    fn test_generate_encoding() {
+        let mut table = HashMap::new();
+        table.insert('a', 10);
+        table.insert('b', 20);
+        table.insert('c', 110);
+        table.insert('d', 80);
+
+        let tree = HuffmanNode::from_freq_table(table);
+
+        let mut got: HashMap<char, String> = HashMap::new();
+        generate_encoding_table_from_tree(tree, &mut got, "".to_string());
+
+        let mut expected = HashMap::new();
+        expected.insert('a', "100".to_string());
+        expected.insert('b', "101".to_string());
+        expected.insert('c', "0".to_string());
+        expected.insert('d', "11".to_string());
+        assert_eq!(got, expected);
     }
 }
