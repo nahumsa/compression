@@ -43,14 +43,13 @@ fn main() {
         Commands::Encode(opts) => {
             let file_content = read_file(opts.filename.as_str());
             let character_frequency = character_count(&file_content);
-            let mut sorted_vec: Vec<_> = character_frequency.iter().collect();
-            sorted_vec.sort_by(|a, b| b.0.cmp(a.0));
-            println!("{:?}", sorted_vec);
+            
+            // generate tree from file
             let tree = HuffmanNode::from_freq_table(character_frequency);
             let mut got: HashMap<char, String> = HashMap::new();
             generate_encoding_table_from_tree(tree, &mut got, "".to_string());
-            let serialized_data = serde_json::to_string(&got).unwrap();
-
+            
+            // converting the string to a vector of strings corresponding to bits
             let mut result_vec: Vec<String> = Vec::new();
             for c in file_content.chars() {
                 if let Some(output_string) = got.get(&c) {
@@ -60,13 +59,30 @@ fn main() {
                 }
             }
             println!("{:?}", result_vec);
-            match write_to_file("test.huff", &serialized_data) {
+            
+            // generate tree representation to json
+            let serialized_data = serde_json::to_string(&got).unwrap();
+            let result = format!("{}\n--\n{}", serialized_data, result_vec.join(" "));
+            match write_to_file("test.huff", &result) {
                 Ok(()) => println!("saved file"),
                 Err(_) => println!("failed to save file"),
             };
         }
         Commands::Decode(opts) => {
-            println!("decoding {}", opts.filename);
+            let file_content = read_file(opts.filename.as_str());
+            
+            if let Some((first_part, second_part)) = file_content.split_once("\n--\n") {
+                let encoded_tree: HashMap<char, String> = serde_json::from_str(first_part).expect("failed to deserialize");
+                let decoded_tree: HashMap<String, char> = encoded_tree.iter().map(|(k, v)| (v.clone(), k.clone())).collect();
+                println!("First part: {:?}", decoded_tree);
+                let mut result_vec: Vec<String> = Vec::new();
+                for code in second_part.split(" ") {
+                     result_vec.push(decoded_tree.get(code).unwrap().to_string());
+                }
+                println!("Second part: {}", result_vec.join(""));
+            } else {
+                println!("Delimiter not found in the string");
+            }
         }
     }
 }
