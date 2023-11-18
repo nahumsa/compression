@@ -58,7 +58,7 @@ fn main() {
                     println!("Character: '{}' not found in the map", c);
                 }
             }
-            println!("{:?}", result_vec);
+            // println!("{:?}", result_vec);
             
             // generate tree representation to json
             let serialized_data = serde_json::to_string(&got).unwrap();
@@ -74,7 +74,7 @@ fn main() {
             if let Some((first_part, second_part)) = file_content.split_once("\n--\n") {
                 let encoded_tree: HashMap<char, String> = serde_json::from_str(first_part).expect("failed to deserialize");
                 let decoded_tree: HashMap<String, char> = encoded_tree.iter().map(|(k, v)| (v.clone(), k.clone())).collect();
-                println!("First part: {:?}", decoded_tree);
+                // println!("First part: {:?}", decoded_tree);
                 let mut result_vec: Vec<String> = Vec::new();
                 for code in second_part.split(" ") {
                      result_vec.push(decoded_tree.get(code).unwrap().to_string());
