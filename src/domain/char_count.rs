@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-pub fn character_count(input: &str) -> HashMap<char, u32> {
-    let mut char_count: HashMap<char, u32> = HashMap::new();
+pub fn character_count(input: &str) -> HashMap<char, u64> {
+    let mut char_count: HashMap<char, u64> = HashMap::new();
     for char in input.chars() {
         let count = char_count.entry(char).or_insert(0);
         *count += 1;

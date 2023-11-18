@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.4.*", features = ["derive"] }
 assert_cmd = { version = "2.*" }
+serde_json = { version = "1.*" }
